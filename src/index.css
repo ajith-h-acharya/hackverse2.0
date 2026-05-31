@@ -1,0 +1,219 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+@import 'leaflet/dist/leaflet.css';
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply bg-amazon-light text-black subpixel-antialiased font-semibold;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-black tracking-tight text-black;
+  }
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: #f3f3f3 !important;
+  /* Richer contrast for Amazon theme */
+  filter: saturate(1.4) contrast(1.2) brightness(0.95);
+}
+
+/* Amazon Style Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors border-2 border-gray-100;
+}
+
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Premium Navigator Link */
+.expedition-link {
+  @apply text-amazon-blue hover:text-amazon-orange hover:underline cursor-pointer font-black;
+}
+
+/* Navigator Primary Button (Yellow) */
+.nav-btn-primary {
+  @apply bg-amazon-yellow hover:bg-[#F7CA00] rounded-2xl shadow-xl border-2 border-white transition-all font-black text-center text-amazon-navy px-6 py-3 active:scale-95;
+}
+
+/* Navigator Secondary Button (Orange) */
+.nav-btn-secondary {
+  @apply bg-amazon-orange hover:bg-[#FA8900] rounded-2xl shadow-xl border-2 border-white transition-all font-black text-center text-white px-6 py-3 active:scale-95;
+}
+
+/* User Pulse Animation */
+.user-pulse {
+  width: 20px;
+  height: 20px;
+  background: #007185;
+  border: 4px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(0, 113, 133, 0.6);
+  position: relative;
+}
+.user-pulse::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 4px solid #007185;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* Animated Path Flow */
+.path-flow {
+  stroke-dasharray: 10, 20;
+  animation: flow 20s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(240, 193, 75, 0.6));
+}
+@keyframes flow {
+  from { stroke-dashoffset: 500; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Voice Recognition Waveform */
+.animate-voice-bar {
+  animation: voice-wave 0.6s ease-in-out infinite alternate;
+}
+@keyframes voice-wave {
+  from { height: 4px; }
+  to { height: 16px; }
+}
+
+/* Map Expedition Popup Styling */
+.expedition-popup .leaflet-popup-content-wrapper {
+  @apply rounded-[2rem] border-4 border-white shadow-2xl p-0 overflow-hidden;
+}
+.expedition-popup .leaflet-popup-content {
+  @apply m-0;
+}
+.expedition-popup .leaflet-popup-tip {
+  @apply hidden;
+}
+
+/* ═══════════════════════════════════════════════ */
+/* ══ LANDING PAGE ANIMATIONS ══ */
+/* ═══════════════════════════════════════════════ */
+
+/* Floating Particles */
+.floating-particle {
+  animation: floatUpDown 15s ease-in-out infinite;
+}
+@keyframes floatUpDown {
+  0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.85; }
+  25% { transform: translateY(50vh) translateX(20px) rotate(90deg); }
+  50% { transform: translateY(0vh) translateX(-20px) rotate(180deg); }
+  75% { transform: translateY(-50vh) translateX(20px) rotate(270deg); }
+  90% { opacity: 0.85; }
+  100% { transform: translateY(-100vh) translateX(0) rotate(360deg); opacity: 0; }
+}
+
+/* Sliding Background Textures */
+@keyframes bg-slide {
+  0% { background-position: 0 0; }
+  100% { background-position: 400px 400px; }
+}
+.animate-bg-slide {
+  animation: bg-slide 60s linear infinite;
+}
+
+/* Fade In on Load */
+.landing-fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: landingFadeIn 0.8s ease-out forwards;
+}
+@keyframes landingFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Category Bubble Pop-in */
+.category-pop-in {
+  opacity: 0;
+  transform: scale(0.6) translateY(20px);
+  animation: categoryPopIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes categoryPopIn {
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Fun Fact Ticker Slide */
+.fact-slide-in {
+  animation: factSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes factSlide {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Scroll Indicator Dot */
+.scroll-dot {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(14px); opacity: 0.3; }
+}
+
+/* CTA Glow Pulse */
+.cta-glow {
+  animation: ctaGlow 3s ease-in-out infinite;
+}
+@keyframes ctaGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(254, 189, 105, 0.15); }
+  50% { box-shadow: 0 0 40px 15px rgba(254, 189, 105, 0.12); }
+}
+
+/* CTA Compass Spin */
+.cta-spin {
+  animation: ctaSpin 12s linear infinite;
+}
+@keyframes ctaSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}

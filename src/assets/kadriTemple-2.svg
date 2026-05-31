@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="sky2" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#F5D8C0" />
+      <stop offset="100%" stop-color="#E8B57C" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky2)" />
+  <rect x="240" y="280" width="720" height="360" rx="40" fill="#7B4F3B" />
+  <path d="M300 280 L600 100 L900 280 Z" fill="#5C3A2A" />
+  <path d="M340 360 L420 360 L420 560 L340 560 Z" fill="#4A2F23" />
+  <path d="M780 360 L860 360 L860 560 L780 560 Z" fill="#4A2F23" />
+  <path d="M520 360 L680 360 L680 560 L520 560 Z" fill="#623E2D" />
+  <text x="600" y="720" text-anchor="middle" font-family="system-ui, sans-serif" font-size="60" fill="#fff" font-weight="700">Kadri Temple</text>
+</svg>

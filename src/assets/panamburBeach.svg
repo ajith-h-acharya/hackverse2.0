@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#59C3FF" />
+      <stop offset="100%" stop-color="#C1E7FF" />
+    </linearGradient>
+    <linearGradient id="sea" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#1A7DB8" />
+      <stop offset="100%" stop-color="#A1D7F1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky)" />
+  <rect y="360" width="1200" height="440" fill="url(#sea)" />
+  <path d="M0 430 C200 380 400 520 600 470 S1000 390 1200 420 L1200 800 L0 800 Z" fill="#ffffff" opacity="0.45" />
+  <circle cx="980" cy="120" r="80" fill="#FFF2A8" />
+  <path d="M130 660 L200 520 L280 660 Z" fill="#F6C06F" />
+  <path d="M160 520 C170 430 250 430 260 520 Z" fill="#7BC47F" />
+  <text x="600" y="720" text-anchor="middle" font-family="system-ui, sans-serif" font-size="72" fill="#ffffff" font-weight="700">Panambur Beach</text>
+</svg>

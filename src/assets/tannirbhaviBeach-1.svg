@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="sky5" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#FFB56B" />
+      <stop offset="100%" stop-color="#FED9B7" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky5)" />
+  <rect y="450" width="1200" height="350" fill="#5BA4C4" />
+  <path d="M0 520 Q120 480 240 520 T480 520 T720 520 T960 520 T1200 520 L1200 800 L0 800 Z" fill="#DAF1FF" opacity="0.7" />
+  <path d="M240 640 Q250 560 280 520 Q310 560 320 640 Z" fill="#523927" />
+  <path d="M280 520 C300 480 360 460 400 520 C420 550 450 520 430 500 C470 440 530 460 520 520" stroke="#305091" stroke-width="16" fill="none" />
+  <text x="600" y="720" text-anchor="middle" font-family="system-ui, sans-serif" font-size="60" fill="#ffffff" font-weight="700">Tannirbhavi Beach</text>
+</svg>

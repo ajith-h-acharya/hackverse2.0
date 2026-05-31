@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="sky4" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#A8E1BF" />
+      <stop offset="100%" stop-color="#52B788" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky4)" />
+  <ellipse cx="600" cy="500" rx="540" ry="170" fill="#7DAE8E" />
+  <ellipse cx="600" cy="520" rx="340" ry="120" fill="#5E8C76" />
+  <ellipse cx="600" cy="520" rx="220" ry="70" fill="#A8D7C4" />
+  <path d="M260 520 C320 420 360 380 400 450 C460 500 520 420 600 450 C680 500 740 420 820 450 C860 520 900 460 940 400 C980 340 1020 430 1080 520" fill="#3B6B5A" opacity="0.7" />
+  <text x="600" y="720" text-anchor="middle" font-family="system-ui, sans-serif" font-size="60" fill="#fff" font-weight="700">Pilikula Nisargadhama</text>
+</svg>

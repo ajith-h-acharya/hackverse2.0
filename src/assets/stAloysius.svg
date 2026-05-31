@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="sky3" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#5B6CC8" />
+      <stop offset="100%" stop-color="#B8C8FF" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky3)" />
+  <ellipse cx="600" cy="260" rx="420" ry="120" fill="#fff" opacity="0.8" />
+  <rect x="380" y="280" width="440" height="340" rx="40" fill="#fff" />
+  <path d="M450 280 Q600 140 750 280" fill="#E6E9F8" />
+  <line x1="450" y1="340" x2="750" y2="340" stroke="#7A81A8" stroke-width="16" />
+  <path d="M520 380 C520 360 580 360 580 380 S660 400 660 380" stroke="#5A638F" stroke-width="14" fill="none" />
+  <text x="600" y="720" text-anchor="middle" font-family="system-ui, sans-serif" font-size="60" fill="#fff" font-weight="700">St. Aloysius Chapel</text>
+</svg>
