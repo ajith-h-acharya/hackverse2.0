@@ -160,6 +160,15 @@ export default function LandingPage() {
       {/* ══ HERO SECTION ══ */}
       {/* ═══════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+        {/* Floating Top Right Pitch Deck Badge */}
+        <Link
+          to="/pitch"
+          className="absolute top-6 right-6 z-50 flex items-center gap-2.5 px-6 py-3.5 bg-white/[0.06] hover:bg-amazon-yellow hover:text-amazon-navy backdrop-blur-2xl border border-white/10 hover:border-amazon-yellow rounded-full transition-all duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.3)] text-xs font-black uppercase tracking-widest text-amazon-yellow hover:scale-105 group no-underline"
+        >
+          <Sparkles className="w-4 h-4 text-amazon-yellow group-hover:text-amazon-navy group-hover:rotate-12 transition-all" />
+          <span>Investor Pitch 🚀</span>
+        </Link>
+
         {/* Layered Background */}
         <div className="absolute inset-0 z-0">
           <img
@@ -226,7 +235,7 @@ export default function LandingPage() {
               <Compass className="w-6 h-6 text-amazon-navy" />
             </div>
             <span className="text-xs font-black uppercase tracking-[0.35em] text-amazon-yellow">
-              Mangalore Navigator
+              manglore.nav
             </span>
           </div>
 
@@ -274,6 +283,15 @@ export default function LandingPage() {
               <span className="absolute inset-0 bg-white/0 group-hover:bg-white/20 transition-colors duration-300" />
               <span className="relative">Start Exploring</span>
               <ArrowRight className="relative w-5 h-5 group-hover:translate-x-2 transition-transform" />
+            </Link>
+            <Link
+              to="/ad"
+              className="group px-12 py-6 rounded-full font-black text-sm uppercase tracking-widest text-white/70 border-2 border-white/10 hover:border-white/30 hover:text-white hover:bg-white/5 transition-all duration-300 flex items-center gap-3"
+            >
+              <span className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-amazon-yellow/20 transition-colors">
+                <svg className="w-3.5 h-3.5 text-amazon-yellow fill-current translate-x-0.5" viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z"/></svg>
+              </span>
+              Watch Our Story
             </Link>
             <Link
               to="/login"
@@ -434,7 +452,7 @@ export default function LandingPage() {
               <span className="text-amazon-yellow">STARTS HERE</span>
             </h2>
             <p className="max-w-2xl mx-auto text-lg text-white/40 font-bold leading-relaxed">
-              From planning to exploring — the Navigator guides every step of your coastal journey.
+              From planning to exploring — manglore.nav guides every step of your coastal journey.
             </p>
           </div>
 
@@ -575,7 +593,7 @@ export default function LandingPage() {
               <Compass className="w-6 h-6 text-amazon-navy" />
             </div>
             <span className="tracking-tighter">
-              <span className="text-amazon-yellow">MANGALORE</span>.NAVIGATOR
+              <span className="text-amazon-yellow">MANGLORE</span>.NAV
             </span>
           </div>
           <div className="flex flex-wrap justify-center gap-8 text-white/30 text-[10px] font-black uppercase tracking-widest mb-10">
@@ -586,7 +604,7 @@ export default function LandingPage() {
             <Link to="/login" className="hover:text-amazon-yellow transition-colors cursor-pointer text-white/30 no-underline">Heritage</Link>
           </div>
           <p className="text-[10px] font-black text-white/15 uppercase tracking-[0.5em]">
-            &copy; {new Date().getFullYear()} Mangalore Navigator. Crafted with ❤️ for Kudla.
+            &copy; {new Date().getFullYear()} manglore.nav. Crafted with ❤️ for Kudla.
           </p>
         </div>
       </footer>

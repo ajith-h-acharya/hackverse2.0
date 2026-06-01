@@ -10,6 +10,8 @@ import RentalsPage from './pages/RentalsPage';
 import PackagesPage from './pages/PackagesPage';
 import CircuitHistoryPage from './pages/CircuitHistoryPage';
 import SavedCircuitsPage from './pages/SavedCircuitsPage';
+import PitchDeckPage from './pages/PitchDeckPage';
+import AdPage from './pages/AdPage';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
         <Route path="/packages" element={<PackagesPage />} />
         <Route path="/history" element={<CircuitHistoryPage />} />
         <Route path="/saved-circuits" element={<SavedCircuitsPage />} />
+        <Route path="/pitch" element={<PitchDeckPage />} />
+        <Route path="/ad" element={<AdPage />} />
       </Routes>
     </BrowserRouter>
   );

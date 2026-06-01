@@ -16,15 +16,71 @@ export default function ChatAssistant({
   const [messages, setMessages] = useState([
     { 
       role: 'bot', 
-      content: "Hello! I'm your Mangalore Navigator AI. You can now use your voice to command me! Click the microphone and say 'Plan a beach trip' to begin." 
+      content: "Hello! I'm your manglore.nav AI. You can now use your voice to command me! Click the microphone and say 'Plan a beach trip' to begin." 
     }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [activeSuggestions, setActiveSuggestions] = useState([]);
   const scrollRef = useRef(null);
   const recognitionRef = useRef(null);
   const [showHelpBubble, setShowHelpBubble] = useState(false);
+
+  const getContextSuggestions = () => {
+    if (selectedLocation) {
+      return [
+        `Tell me about ${selectedLocation.name} ℹ️`,
+        `Route to ${selectedLocation.name} 🚗`,
+        `Add ${selectedLocation.name} to stops 📍`
+      ];
+    }
+
+    switch (activeTab) {
+      case 'stays':
+        return [
+          "Show luxury hotels 🏨",
+          "Find budget options 💰",
+          "Recommend a resort 🌊"
+        ];
+      case 'dining':
+        return [
+          "Where is Mitra Samaj? 🍛",
+          "Where is Giri Manja's? 🐟",
+          "Find ice cream parlors 🍨"
+        ];
+      case 'routes':
+        return [
+          "Explain the travel circuits 🗺️",
+          "Plan a beach trip 🌊",
+          "Show religious circuits 🛕"
+        ];
+      case 'favorites':
+        return [
+          "Create a route from favorites 📍",
+          "Recommend similar places"
+        ];
+      default:
+        return [
+          "Plan a coastal trip 🌊",
+          "Show religious sites 🛕",
+          "Suggest seafood spots 🍛",
+          "Recommend a hotel 🏨"
+        ];
+    }
+  };
+
+  useEffect(() => {
+    if (selectedLocation) {
+      setActiveSuggestions([
+        `Tell me about ${selectedLocation.name} ℹ️`,
+        `Route to ${selectedLocation.name} 🚗`,
+        `Add ${selectedLocation.name} to stops 📍`
+      ]);
+    } else if (messages.length <= 1) {
+      setActiveSuggestions(getContextSuggestions());
+    }
+  }, [selectedLocation, activeTab]);
 
   useEffect(() => {
     if (isOpen) {
@@ -104,6 +160,7 @@ export default function ChatAssistant({
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
+    setActiveSuggestions([]); // Clear suggestions during thinking phase
 
     try {
       // Call Real Gemini API (passing current history for local mode memory)
@@ -135,6 +192,13 @@ export default function ChatAssistant({
         isAction: !!result.action
       }]);
 
+      // Set new suggestions if returned by the response, otherwise default context
+      if (result.action && Array.isArray(result.action.suggestions)) {
+        setActiveSuggestions(result.action.suggestions);
+      } else {
+        setActiveSuggestions(getContextSuggestions());
+      }
+
       // Speak the response using Web Speech API
       try {
         const synth = window.speechSynthesis;
@@ -160,9 +224,16 @@ export default function ChatAssistant({
         role: 'bot', 
         content: "Synchronization failed. Please check your neural link (API Key)."
       }]);
+      setActiveSuggestions(["Retry synchronization", "Plan a beach trip"]);
     } finally {
       setIsTyping(false);
     }
+  };
+
+  const handleSuggestionClick = (suggestionText) => {
+    // Strip trailing emoji icon to make the AI query clean
+    const cleanedText = suggestionText.replace(/ [\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, '').trim();
+    handleSend(cleanedText);
   };
 
   return (
@@ -205,7 +276,7 @@ export default function ChatAssistant({
                 <Compass className="w-6 h-6 animate-spin-slow" />
               </div>
               <div>
-                <h3 className="text-white font-black text-sm tracking-tight leading-none">Navigator AI</h3>
+                <h3 className="text-white font-black text-sm tracking-tight leading-none">manglore.nav AI</h3>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                   <span className="text-[10px] font-black text-amazon-yellow uppercase tracking-widest">Voice Protocol Ready</span>
@@ -263,6 +334,22 @@ export default function ChatAssistant({
               </div>
             )}
           </div>
+          
+          {/* Dynamic Suggestion Chips */}
+          {activeSuggestions && activeSuggestions.length > 0 && (
+            <div className="px-6 py-3 bg-gray-50 border-t border-gray-100 flex gap-2 overflow-x-auto custom-scrollbar shrink-0 select-none">
+              {activeSuggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  className="px-4 py-2 bg-white border-2 border-gray-100 hover:border-amazon-navy rounded-full text-xs font-black text-amazon-navy hover:text-white hover:bg-amazon-navy transition-all shrink-0 shadow-sm cursor-pointer active:scale-95 whitespace-nowrap flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amazon-orange shrink-0 animate-pulse" />
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Input Area */}
           <div className="p-6 bg-white border-t border-gray-100">
@@ -270,7 +357,7 @@ export default function ChatAssistant({
               <div className="relative flex-1 group">
                 <input
                   type="text"
-                  placeholder={isListening ? "Speak now..." : "Ask Navigator..."}
+                  placeholder={isListening ? "Speak now..." : "Ask manglore.nav..."}
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyPress={e => e.key === 'Enter' && handleSend()}

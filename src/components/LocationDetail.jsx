@@ -272,7 +272,7 @@ export default function LocationDetail({
             <span className="text-[10px] font-black text-amazon-navy uppercase tracking-[0.2em]">
               {location.category || location.type || 'Hospitality'} Node
             </span>
-            <span className="text-xs font-bold text-gray-400">Mangalore Navigator</span>
+            <span className="text-xs font-bold text-gray-400">manglore.nav</span>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -587,7 +587,7 @@ function SuccessView({ onClose, onBack, location }) {
           onClick={onClose}
           className="w-full py-4 bg-transparent border-2 border-gray-200 hover:border-black text-black rounded-[2rem] text-xs font-black uppercase tracking-widest transition-all active:scale-95"
         >
-          Close Navigator
+          Close manglore.nav
         </button>
       </div>
     </div>
@@ -682,7 +682,7 @@ function HotelSuccessView({ onClose, onBack, location }) {
           onClick={onClose}
           className="w-full py-4 bg-transparent border-2 border-gray-200 hover:border-black text-black rounded-[2rem] text-xs font-black uppercase tracking-widest transition-all active:scale-95"
         >
-          Close Navigator
+          Close manglore.nav
         </button>
       </div>
     </div>

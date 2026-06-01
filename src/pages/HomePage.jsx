@@ -59,7 +59,7 @@ export default function HomePage() {
       {/* Floating Top Header */}
       <nav className="absolute top-0 left-0 w-full z-50 px-8 py-6 flex justify-between items-center bg-transparent">
         <div className="flex items-center gap-3 text-white font-black text-xl tracking-tight select-none">
-          <span className="text-amazon-yellow">MANGALORE</span>.NAVIGATOR
+          <span className="text-amazon-yellow">MANGLORE</span>.NAV
         </div>
         <div className="flex items-center gap-6">
           <Link to="/saved-circuits" className="text-white/70 hover:text-amazon-yellow text-xs font-black uppercase tracking-widest transition-colors no-underline flex items-center gap-1.5">
@@ -106,7 +106,7 @@ export default function HomePage() {
           <FloatingParticle delay={13} duration={24} left={45} size="15px" text="KUDLA" color="#a855f7" />
           <FloatingParticle delay={15} duration={27} left={75} size="13px" text="TULUNADU" color="#ec4899" />
           <FloatingParticle delay={17} duration={23} left={28} size="16px" text="MANGALORE" color="#38bdf8" />
-          <FloatingParticle delay={20} duration={25} left={62} size="12px" text="NAVIGATOR" color="#f0c14b" />
+          <FloatingParticle delay={20} duration={25} left={62} size="12px" text="NAV" color="#f0c14b" />
         </div>
         
         {/* Hero Content */}
@@ -117,8 +117,8 @@ export default function HomePage() {
           </div>
           
           <h1 className="text-6xl md:text-[10rem] font-black tracking-tighter mb-8 leading-[0.85] animate-in zoom-in duration-700 drop-shadow-[0_4px_30px_rgba(0,0,0,0.95)]">
-            <span className="text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">MANGALORE</span><br/>
-            <span className="bg-gradient-to-r from-amazon-yellow to-amazon-orange bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(254,189,105,0.45)]">NAVIGATOR</span>
+            <span className="text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">MANGLORE</span><br/>
+            <span className="bg-gradient-to-r from-amazon-yellow to-amazon-orange bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(254,189,105,0.45)]">NAV</span>
           </h1>
           
           <p className="text-lg md:text-2xl text-white/70 max-w-3xl mb-16 font-bold leading-relaxed animate-in fade-in duration-1000 delay-300">
@@ -361,7 +361,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
            <div className="flex flex-col items-center gap-10 mb-20">
               <div className="flex items-center gap-4 text-white font-black text-4xl">
-                 <span className="text-amazon-yellow tracking-tighter">MANGALORE</span>.NAVIGATOR
+                 <span className="text-amazon-yellow tracking-tighter">MANGLORE</span>.NAV
               </div>
                <div className="flex gap-12 text-white/40 text-xs font-black uppercase tracking-widest flex-wrap justify-center">
                   <Link to="/map?theme=coastal" className="hover:text-amazon-yellow transition-colors text-white/40 no-underline">Coastal</Link>
@@ -372,7 +372,7 @@ export default function HomePage() {
                   <Link to="/history" className="hover:text-amazon-yellow transition-colors text-white/40 no-underline">History Log</Link>
                </div>
            </div>
-           <p className="font-black text-[10px] text-white/20 uppercase tracking-[0.5em]">&copy; {new Date().getFullYear()} MANGALORE NAVIGATOR. ALL SYSTEMS OPERATIONAL.</p>
+           <p className="font-black text-[10px] text-white/20 uppercase tracking-[0.5em]">&copy; {new Date().getFullYear()} MANGLORE.NAV. ALL SYSTEMS OPERATIONAL.</p>
         </div>
         <ChatAssistant 
           locations={locations} 

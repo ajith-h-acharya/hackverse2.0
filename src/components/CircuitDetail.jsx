@@ -197,7 +197,7 @@ export default function CircuitDetail({
             <span className="text-[10px] font-black text-amazon-orange uppercase tracking-[0.2em]">
               Custom Circuit Panel
             </span>
-            <span className="text-xs font-bold text-gray-400">Mangalore Navigator</span>
+            <span className="text-xs font-bold text-gray-400">manglore.nav</span>
           </div>
         </div>
         <button 

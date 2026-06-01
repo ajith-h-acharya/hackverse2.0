@@ -41,7 +41,7 @@ export default function Sidebar({
               <Explorer className="w-6 h-6 text-amazon-navy" />
            </div>
            <div className="flex flex-col">
-              <h1 className="text-white font-black text-xl tracking-tight leading-none">MANGALORE</h1>
+              <h1 className="text-white font-black text-xl tracking-tight leading-none">MANGLORE<span className="text-amazon-yellow">.NAV</span></h1>
               <p className="text-amazon-yellow text-[10px] font-black tracking-[0.2em] uppercase mt-1">Tourism Navigator</p>
            </div>
         </div>
