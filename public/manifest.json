@@ -1,0 +1,16 @@
+{
+  "short_name": "Mangalore.Nav",
+  "name": "Mangalore.Nav — Kudla Travel Planner",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#090e1a",
+  "theme_color": "#f0c14b",
+  "display": "standalone",
+  "orientation": "portrait"
+}

@@ -4,6 +4,9 @@ import {
   ArrowLeft, ArrowRight, Compass, Trash2, Calendar, MapPin, 
   Map, Route, Navigation, History, Bookmark, CheckCircle, Info 
 } from 'lucide-react';
+import { locations } from '../data/locations';
+import { hiddenGems } from '../data/hiddenGems';
+import { generateGoogleMapsDirUrl } from '../utils/maps';
 
 export default function SavedCircuitsPage() {
   const navigate = useNavigate();
@@ -54,6 +57,26 @@ export default function SavedCircuitsPage() {
     if (item.stops && item.stops.length > 0) {
       const stopIds = item.stops.map(s => s.id).join(',');
       navigate(`/map?circuit=${stopIds}`);
+    }
+  };
+
+  const handleExportToGoogleMaps = (item) => {
+    if (item.stops && item.stops.length > 0) {
+      const allSearchable = [...locations, ...hiddenGems];
+      const resolvedStops = item.stops
+        .map(s => allSearchable.find(loc => loc.id === s.id))
+        .filter(Boolean);
+        
+      if (resolvedStops.length > 0) {
+        const url = generateGoogleMapsDirUrl(resolvedStops);
+        if (url) {
+          window.open(url, '_blank');
+        } else {
+          alert("Could not generate Google Maps route (no valid coordinates found).");
+        }
+      } else {
+        alert("Could not resolve circuit stops coordinate details.");
+      }
     }
   };
 
@@ -240,13 +263,22 @@ export default function SavedCircuitsPage() {
                     <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">
                       Custom Module MN-SAVED-{item.id.split('-')[1] || item.id}
                     </span>
-                    <button 
-                      onClick={() => handlePlotOnMap(item)}
-                      className="px-6 py-3 bg-amazon-yellow hover:bg-[#FA8900] text-amazon-navy hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
-                    >
-                      <Navigation className="w-4 h-4" />
-                      Plot on Map
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => handleExportToGoogleMaps(item)}
+                        className="px-5 py-3 bg-white/5 border border-white/10 hover:bg-white/15 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                      >
+                        <Map className="w-4 h-4 text-amazon-yellow" />
+                        Export to Google Maps
+                      </button>
+                      <button 
+                        onClick={() => handlePlotOnMap(item)}
+                        className="px-6 py-3 bg-amazon-yellow hover:bg-[#FA8900] text-amazon-navy hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                      >
+                        <Navigation className="w-4 h-4" />
+                        Plot on Map
+                      </button>
+                    </div>
                   </div>
                 </div>
               );

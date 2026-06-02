@@ -27,7 +27,7 @@ export default function Sidebar({
     .filter(loc =>
       searchQuery === '' ||
       loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      loc.description.toLowerCase().includes(searchQuery.toLowerCase())
+      (loc.description || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
   const categories = ['All', 'Coastal', 'Religious', 'Heritage', 'Nature', 'Culinary', 'Urban'];

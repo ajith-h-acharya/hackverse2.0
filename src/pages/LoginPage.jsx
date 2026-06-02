@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Shield, Lock, User, ArrowRight, Compass, Zap, CheckCircle, Mail, Phone, Users, Calendar, WifiOff } from 'lucide-react';
+import { Shield, Lock, User, ArrowRight, Compass, Zap, CheckCircle, Mail, Phone, Users, Calendar, WifiOff, X, Key } from 'lucide-react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -17,6 +17,17 @@ export default function LoginPage() {
   });
   const [errors, setErrors] = useState({});
   const [simulationNotice, setSimulationNotice] = useState(null);
+
+  // Forgot Password Recovery Flow States
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotOtp, setForgotOtp] = useState('');
+  const [forgotNewPassword, setForgotNewPassword] = useState('');
+  const [forgotError, setForgotError] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [simulatedCode, setSimulatedCode] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -73,7 +84,7 @@ export default function LoginPage() {
         return;
       }
       
-      proceedToHome();
+      proceedToHome(data.sessionToken, data.user);
     } catch (err) {
       console.warn("Backend server connection failed. Engaging elegant client-side fallback:", err);
       
@@ -83,24 +94,180 @@ export default function LoginPage() {
       // Simulate brief network latency for premium sci-fi feel
       setTimeout(() => {
         setSimulationNotice(null);
-        proceedToHome();
+        proceedToHome(null, null);
       }, 3500);
     }
   };
 
-  const proceedToHome = () => {
+  const proceedToHome = async (sessionToken, user) => {
+    setSuccessLoading(true);
+    
+    if (sessionToken && user) {
+      if (window.__setSyncLoading) window.__setSyncLoading(true);
+      
+      // Clean original user back up when starting a fresh/direct login
+      localStorage.removeItem('mangalore_original_user');
+      
+      localStorage.setItem('mangalore_user_name', user.name || '');
+      localStorage.setItem('mangalore_user_email', user.email);
+      localStorage.setItem('mangalore_user_phone', user.phone || '');
+      localStorage.setItem('mangalore_user_squad_size', user.squadSize || '4');
+      localStorage.setItem('mangalore_user_expedition_days', user.expeditionDays || '5');
+      localStorage.setItem('mangalore_session_token', sessionToken);
+      localStorage.setItem('mangalore_saved_circuits', user.savedCircuits || '[]');
+      localStorage.setItem('mangalore_circuit_history', user.circuitHistory || '[]');
+      localStorage.setItem('mangalore_favorites', user.favorites || '[]');
+      
+      if (window.__setSyncLoading) window.__setSyncLoading(false);
+      
+      setTimeout(() => {
+        if (user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/home');
+        }
+      }, 2500);
+      return;
+    }
+
+    // Offline / simulation fallback
+    if (window.__setSyncLoading) window.__setSyncLoading(true);
+    
+    localStorage.removeItem('mangalore_original_user');
+    localStorage.removeItem('mangalore_saved_circuits');
+    localStorage.removeItem('mangalore_circuit_history');
+    localStorage.removeItem('mangalore_favorites');
+
+    const fakeToken = "sim-session-" + Math.random().toString(36).substring(2);
+
     if (isLogin) {
       const nameFromEmail = formData.email.split('@')[0];
       const capitalizedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
       localStorage.setItem('mangalore_user_name', capitalizedName);
+      localStorage.setItem('mangalore_user_email', formData.email);
+      localStorage.setItem('mangalore_session_token', fakeToken);
+      localStorage.setItem('mangalore_user_phone', '9876543210');
+      localStorage.setItem('mangalore_user_squad_size', '4');
+      localStorage.setItem('mangalore_user_expedition_days', '5');
     } else {
       localStorage.setItem('mangalore_user_name', formData.fullName);
+      localStorage.setItem('mangalore_user_email', formData.email);
+      localStorage.setItem('mangalore_user_phone', formData.phone);
+      localStorage.setItem('mangalore_user_squad_size', formData.squadSize || '4');
+      localStorage.setItem('mangalore_user_expedition_days', formData.expeditionDays || '5');
+      localStorage.setItem('mangalore_session_token', fakeToken);
+    }
+    
+    if (window.__setSyncLoading) window.__setSyncLoading(false);
+
+    // Save initial details to DB
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const syncData = {
+        email: formData.email,
+        requestorEmail: formData.email,
+        token: fakeToken,
+        name: localStorage.getItem('mangalore_user_name') || '',
+        phone: localStorage.getItem('mangalore_user_phone') || '',
+        squadSize: localStorage.getItem('mangalore_user_squad_size') || '',
+        expeditionDays: localStorage.getItem('mangalore_user_expedition_days') || '',
+        savedCircuits: '[]',
+        circuitHistory: '[]',
+        favorites: '[]'
+      };
+      await fetch(`${API_URL}/api/user-data`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(syncData)
+      });
+    } catch (e) {
+      console.warn("Initial user sync failed in fallback:", e);
     }
 
-    setSuccessLoading(true);
     setTimeout(() => {
       navigate('/home');
     }, 2500);
+  };
+
+  const handleRequestOtp = async (e) => {
+    e.preventDefault();
+    setForgotError('');
+    setForgotSuccess('');
+    setSimulatedCode(null);
+    if (!forgotEmail) {
+      setForgotError("Email address is required.");
+      return;
+    }
+
+    setForgotLoading(true);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    try {
+      const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to dispatch recovery code.");
+      }
+
+      setForgotSuccess(data.message || "Verification code dispatched successfully.");
+      if (data.otp) {
+        setSimulatedCode(data.otp);
+      }
+      setForgotStep(2);
+    } catch (err) {
+      setForgotError(err.message);
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleResetPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setForgotError('');
+    setForgotSuccess('');
+    if (!forgotOtp || !forgotNewPassword) {
+      setForgotError("Security code and new password are required.");
+      return;
+    }
+
+    setForgotLoading(true);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    try {
+      const response = await fetch(`${API_URL}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: forgotEmail,
+          otp: forgotOtp,
+          newPassword: forgotNewPassword
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Verification failed.");
+      }
+
+      setForgotSuccess("Security Key recovered! Initiating redirect to access terminal...");
+      setSimulatedCode(null);
+      
+      setTimeout(() => {
+        setFormData(prev => ({ ...prev, email: forgotEmail, password: forgotNewPassword }));
+        setShowForgotModal(false);
+        // Reset states
+        setForgotStep(1);
+        setForgotEmail('');
+        setForgotOtp('');
+        setForgotNewPassword('');
+        setForgotSuccess('');
+      }, 3000);
+    } catch (err) {
+      setForgotError(err.message);
+    } finally {
+      setForgotLoading(false);
+    }
   };
 
   return (
@@ -277,7 +444,21 @@ export default function LoginPage() {
                        <input type="checkbox" className="w-4 h-4 rounded border-2 border-gray-200 accent-amazon-navy" />
                        Keep Session
                     </label>
-                    {isLogin && <a href="#" className="text-amazon-orange hover:underline">Forgot Key?</a>}
+                    {isLogin && (
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setForgotError('');
+                          setForgotSuccess('');
+                          setForgotEmail(formData.email);
+                          setForgotStep(1);
+                          setShowForgotModal(true);
+                        }} 
+                        className="text-amazon-orange hover:underline cursor-pointer focus:outline-none"
+                      >
+                        Forgot Key?
+                      </button>
+                    )}
                  </div>
 
                  <button 
@@ -314,6 +495,162 @@ export default function LoginPage() {
            </div>
         </div>
       </div>
+
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-amazon-navy/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)] overflow-hidden border-4 border-white/10 p-8 md:p-10 animate-in zoom-in duration-300">
+            {/* Close button */}
+            <button 
+              type="button"
+              onClick={() => {
+                setShowForgotModal(false);
+                setForgotStep(1);
+                setForgotEmail('');
+                setForgotOtp('');
+                setForgotNewPassword('');
+                setForgotError('');
+                setForgotSuccess('');
+                setSimulatedCode(null);
+              }}
+              className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-700 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-8">
+              <div className="w-14 h-14 bg-amazon-orange/10 rounded-2xl flex items-center justify-center text-amazon-orange shadow-xl rotate-3 mx-auto mb-4">
+                <Key className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-black text-black tracking-tight uppercase">Security Key Recovery</h3>
+              <p className="text-gray-400 font-bold text-xs mt-1">
+                Recover your access protocol for Sector 74
+              </p>
+            </div>
+
+            {forgotError && (
+              <div className="p-3 mb-5 bg-red-50 text-red-500 text-xs font-bold rounded-xl border border-red-200 text-center animate-shake">
+                {forgotError}
+              </div>
+            )}
+
+            {forgotSuccess && (
+              <div className="p-3 mb-5 bg-green-50 text-green-600 text-xs font-bold rounded-xl border border-green-200 text-center">
+                {forgotSuccess}
+              </div>
+            )}
+
+            {simulatedCode && (
+              <div className="p-4 mb-5 bg-amazon-navy text-white rounded-xl border border-amazon-yellow text-center animate-pulse">
+                <p className="text-[10px] font-black text-amazon-yellow uppercase tracking-widest mb-1">
+                  Developer Simulation Console
+                </p>
+                <p className="text-lg font-mono font-bold tracking-[0.3em]">
+                  OTP: {simulatedCode}
+                </p>
+                <p className="text-[9px] text-gray-400 mt-1">
+                  This OTP has also been logged to Admin Telemetry logs.
+                </p>
+              </div>
+            )}
+
+            {forgotStep === 1 ? (
+              <form onSubmit={handleRequestOtp} className="space-y-5">
+                <div className="space-y-2 text-left">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">
+                    Registered Comm-Link Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input 
+                      type="email" 
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      placeholder="explorer@mission.com"
+                      required
+                      className="w-full pl-14 pr-6 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm font-black focus:bg-white focus:border-amazon-navy transition-all outline-none"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={forgotLoading}
+                  className="w-full py-5 bg-amazon-navy text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl hover:shadow-amazon-navy/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer"
+                >
+                  {forgotLoading ? (
+                    <div className="w-6 h-6 border-4 border-amazon-yellow border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      Request Recovery Code
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleResetPasswordSubmit} className="space-y-5">
+                <div className="space-y-2 text-left">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">
+                    6-Digit Verification Code
+                  </label>
+                  <div className="relative">
+                    <Shield className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input 
+                      type="text" 
+                      maxLength="6"
+                      value={forgotOtp}
+                      onChange={(e) => setForgotOtp(e.target.value.replace(/\D/g, ''))}
+                      placeholder="000000"
+                      required
+                      className="w-full pl-14 pr-6 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm font-black text-center tracking-[0.5em] focus:bg-white focus:border-amazon-navy transition-all outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-left">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">
+                    New Security Key (Password)
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input 
+                      type="password" 
+                      value={forgotNewPassword}
+                      onChange={(e) => setForgotNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      className="w-full pl-14 pr-6 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm font-black focus:bg-white focus:border-amazon-navy transition-all outline-none"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={forgotLoading}
+                  className="w-full py-5 bg-amazon-orange text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl hover:shadow-amazon-orange/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer"
+                >
+                  {forgotLoading ? (
+                    <div className="w-6 h-6 border-4 border-amazon-yellow border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      Reset Security Key
+                      <CheckCircle className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+                
+                <button 
+                  type="button" 
+                  onClick={() => setForgotStep(1)}
+                  className="w-full py-3 text-gray-400 hover:text-gray-600 rounded-2xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer"
+                >
+                  Back to request code
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -63,20 +63,14 @@ const userIcon = L.divIcon({
 function MapUpdater({ center, zoom, bounds }) {
   const map = useMap();
   
-  // Use stringified versions for dependency array to prevent infinite re-renders
-  // since center and bounds are new array instances on every render.
-  const centerStr = center ? `${center[0]},${center[1]}` : '';
-  const boundsStr = bounds ? `${bounds[0][0]},${bounds[0][1]},${bounds[1][0]},${bounds[1][1]}` : '';
-
   useEffect(() => {
     map.invalidateSize();
     if (bounds) {
-      map.fitBounds(bounds, { padding: [100, 100], duration: 1.5 });
+      map.fitBounds(bounds, { padding: [50, 50] });
     } else if (center) {
-      map.flyTo(center, zoom, { duration: 1.5 });
+      map.setView(center, zoom);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [centerStr, zoom, boundsStr, map]);
+  }, [center, zoom, bounds, map]);
   
   return null;
 }
@@ -89,8 +83,13 @@ export default function MapComponent({
   onLocationClick
 }) {
   const [routeGeometry, setRouteGeometry] = useState([]);
-  const [showAllMarkers, setShowAllMarkers] = useState(true);
+  const [showAllMarkers, setShowAllMarkers] = useState(false);
   const [mapFocus, setMapFocus] = useState('auto');
+  const lastFetchedCoords = React.useRef(null);
+  const routeCache = React.useRef({});
+  const lastFetchedKey = React.useRef('');
+
+  const MAX_BG_MARKERS = 120; // Performance cap: show nearest 120 when no route active
 
   useEffect(() => {
     setMapFocus('auto');
@@ -100,54 +99,126 @@ export default function MapComponent({
   const defaultZoom = 13;
   const validRouteLocs = React.useMemo(() => (routeLocations || []).filter(Boolean), [routeLocations]);
 
-  const prevDeps = React.useRef({ validRouteLocs: [], selectedLocation: null });
-
   useEffect(() => {
     let timeoutId;
+
     const getRoadPath = async () => {
-      const points = [];
+      const rawPoints = [];
       
       if (validRouteLocs.length > 0) {
-        points.push(...validRouteLocs);
+        rawPoints.push(...validRouteLocs);
       } else if (selectedLocation) {
-        if (userLocation) points.push({ lat: userLocation[0], lng: userLocation[1] });
-        points.push({ lat: selectedLocation.lat, lng: selectedLocation.lng });
+        if (userLocation) rawPoints.push({ lat: userLocation[0], lng: userLocation[1] });
+        rawPoints.push({ lat: selectedLocation.lat, lng: selectedLocation.lng });
       }
+
+      // Filter out points with invalid coordinates
+      const points = rawPoints.filter(p => p && typeof p.lat === 'number' && typeof p.lng === 'number' && !isNaN(p.lat) && !isNaN(p.lng));
 
       if (points.length < 2) {
         setRouteGeometry([]);
+        lastFetchedCoords.current = null;
         return;
       }
 
-      try {
-        const coordsString = points.map(loc => `${loc.lng},${loc.lat}`).join(';');
-        const radiusesString = points.map(() => '5000').join(';'); // 5km snap radius
-        const controller = new AbortController();
-        const fetchTimeout = setTimeout(() => controller.abort(), 5000);
-
-        const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${coordsString}?overview=full&geometries=geojson&radiuses=${radiusesString}`, { signal: controller.signal });
-        clearTimeout(fetchTimeout);
-        
-        const data = await response.json();
-        if (data.routes?.[0]) {
-          const roadPoints = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
-          setRouteGeometry(roadPoints);
-        } else {
-          setRouteGeometry(points.map(l => [l.lat, l.lng]));
-        }
-      } catch (error) {
-        console.warn("OSRM Route failed, falling back to direct path", error);
-        setRouteGeometry(points.map(l => [l.lat, l.lng]));
+      // Check if coordinates changed significantly
+      const coordsString = points.map(loc => `${loc.lat.toFixed(4)},${loc.lng.toFixed(4)}`).join(';');
+      if (lastFetchedCoords.current === coordsString) {
+        return; // Skip duplicate fetch on minor GPS jitter
       }
+      lastFetchedCoords.current = coordsString;
+
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const pathSegments = [];
+
+      // Fetch each consecutive leg individually to isolate errors (e.g. islands, rivers) and cache aggressively
+      for (let i = 0; i < points.length - 1; i++) {
+        const start = points[i];
+        const end = points[i+1];
+        const legCacheKey = `${start.lat.toFixed(4)},${start.lng.toFixed(4)};${end.lat.toFixed(4)},${end.lng.toFixed(4)}`;
+        
+        if (routeCache.current[legCacheKey]) {
+          pathSegments.push(...routeCache.current[legCacheKey]);
+          continue;
+        }
+        
+        // Add a pacing delay for subsequent uncached requests to prevent hitting rate limiters
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+        
+        const legCoordsString = `${start.lng},${start.lat};${end.lng},${end.lat}`;
+        let legPoints = null;
+        
+        // 1. Try local backend route proxy
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 3500);
+          const response = await fetch(`${API_URL}/api/route?coords=${legCoordsString}`, { signal: controller.signal });
+          clearTimeout(timeout);
+          const data = await response.json();
+          if (data.routes?.[0]?.geometry?.coordinates) {
+            legPoints = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+          }
+        } catch (err) {
+          console.warn(`Backend proxy failed for leg ${i}:`, err);
+        }
+        
+        // 2. Try OpenStreetMap Germany Router
+        if (!legPoints) {
+          try {
+            const controller1 = new AbortController();
+            const timeout1 = setTimeout(() => controller1.abort(), 3500);
+            const response = await fetch(`https://routing.openstreetmap.de/routed-car/route/v1/driving/${legCoordsString}?overview=full&geometries=geojson`, { signal: controller1.signal });
+            clearTimeout(timeout1);
+            const data = await response.json();
+            if (data.routes?.[0]?.geometry?.coordinates) {
+              legPoints = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            }
+          } catch (err) {
+            console.warn(`OSM Germany Router failed for leg ${i}:`, err);
+          }
+        }
+        
+        // 3. Try Backup Router
+        if (!legPoints) {
+          try {
+            const controller2 = new AbortController();
+            const timeout2 = setTimeout(() => controller2.abort(), 3500);
+            const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${legCoordsString}?overview=full&geometries=geojson`, { signal: controller2.signal });
+            clearTimeout(timeout2);
+            const data = await response.json();
+            if (data.routes?.[0]?.geometry?.coordinates) {
+              legPoints = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            }
+          } catch (err) {
+            console.warn(`Backup Demo Router failed for leg ${i}:`, err);
+          }
+        }
+        
+        if (legPoints && legPoints.length > 0) {
+          routeCache.current[legCacheKey] = legPoints;
+          pathSegments.push(...legPoints);
+        } else {
+          // Fallback to straight line for this single leg only
+          const fallbackLeg = [[start.lat, start.lng], [end.lat, end.lng]];
+          routeCache.current[legCacheKey] = fallbackLeg;
+          pathSegments.push(...fallbackLeg);
+        }
+      }
+      
+      setRouteGeometry(pathSegments);
     };
     
-    const isRouteChanged = prevDeps.current.validRouteLocs !== validRouteLocs || prevDeps.current.selectedLocation !== selectedLocation;
-    prevDeps.current = { validRouteLocs, selectedLocation };
+    // Determine structural changes vs coordinate jitter
+    const currentRouteKey = `${validRouteLocs.map(l => l.id).join(';')}-${selectedLocation?.id || 'none'}`;
+    const isStructureChanged = lastFetchedKey.current !== currentRouteKey;
+    lastFetchedKey.current = currentRouteKey;
 
-    if (isRouteChanged) {
-      getRoadPath(); // Immediate response for user clicks
+    if (isStructureChanged) {
+      getRoadPath(); // Immediate response for user clicks (0ms debounce)
     } else {
-      timeoutId = setTimeout(getRoadPath, 1000); // Throttled response for GPS tracking movement
+      timeoutId = setTimeout(getRoadPath, 1200); // Debounced response for GPS tracking/movement to prevent spamming
     }
     
     return () => clearTimeout(timeoutId);
@@ -200,20 +271,43 @@ export default function MapComponent({
     }
   }
 
+  const routeStructureKey = React.useMemo(() => {
+    const routeIds = validRouteLocs.map(l => l.id).join(';');
+    const selectedId = selectedLocation ? selectedLocation.id : 'none';
+    let key = `${mapFocus}-${routeIds}-${selectedId}`;
+    if (mapFocus === 'user' && userLocation) {
+      key += `-${userLocation[0].toFixed(4)},${userLocation[1].toFixed(4)}`;
+    }
+    return key;
+  }, [validRouteLocs, selectedLocation, mapFocus, userLocation]);
+
   const allLocationsToRender = React.useMemo(() => {
     const locMap = new Map();
-    (locations || []).forEach(l => locMap.set(l.id, l));
-    
+
+    // Always include route stops and selected location
+    const priorityIds = new Set();
     validRouteLocs.forEach(l => {
-      if (l.id !== 'user' && !locMap.has(l.id)) locMap.set(l.id, l);
+      if (l.id !== 'user') { locMap.set(l.id, l); priorityIds.add(l.id); }
     });
-    
-    if (selectedLocation && selectedLocation.id !== 'user' && !locMap.has(selectedLocation.id)) {
+    if (selectedLocation && selectedLocation.id !== 'user') {
       locMap.set(selectedLocation.id, selectedLocation);
+      priorityIds.add(selectedLocation.id);
     }
-    
+
+    if (showAllMarkers) {
+      // Sort background markers by distance to map center, cap at MAX_BG_MARKERS
+      const mapCenter = currentCenter; // [lat, lng]
+      const bgLocs = (locations || []).filter(l => !priorityIds.has(l.id));
+      bgLocs.sort((a, b) => {
+        const da = Math.hypot(a.lat - mapCenter[0], a.lng - mapCenter[1]);
+        const db = Math.hypot(b.lat - mapCenter[0], b.lng - mapCenter[1]);
+        return da - db;
+      });
+      bgLocs.slice(0, MAX_BG_MARKERS).forEach(l => { if (!locMap.has(l.id)) locMap.set(l.id, l); });
+    }
+
     return Array.from(locMap.values());
-  }, [locations, validRouteLocs, selectedLocation]);
+  }, [locations, validRouteLocs, selectedLocation, showAllMarkers, currentCenter, MAX_BG_MARKERS]);
 
   const markerComponents = React.useMemo(() => {
     return allLocationsToRender.map(loc => {
@@ -265,13 +359,17 @@ export default function MapComponent({
     });
   }, [locations, selectedLocation, validRouteLocs, onLocationClick, showAllMarkers]);
 
+  const handleMapInteract = React.useCallback(() => {
+    setMapFocus('manual');
+  }, []);
+
   return (
     <div className="w-full h-full bg-gray-100 relative">
       {/* Precision Controls */}
       <div className="absolute top-24 right-8 z-[1000] flex flex-col gap-4">
         <button
           onClick={() => setShowAllMarkers(!showAllMarkers)}
-          className={`bg-white p-4 rounded-2xl shadow-2xl border-2 ${!showAllMarkers ? 'border-red-500 text-red-500' : 'border-white text-amazon-navy'} hover:bg-amazon-yellow hover:text-amazon-navy hover:border-white transition-all active:scale-90`}
+          className={`bg-white p-4 rounded-2xl shadow-2xl border-2 ${!showAllMarkers ? 'border-amazon-navy text-amazon-navy' : 'border-red-400 text-red-500'} hover:bg-amazon-yellow hover:text-amazon-navy hover:border-white transition-all active:scale-90`}
           title={showAllMarkers ? "Hide Background Markers" : "Show Nearby Places"}
         >
           {showAllMarkers ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}

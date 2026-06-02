@@ -175,7 +175,7 @@ export default function RouteBuilder({ locations = [], onSelectCircuit, customSt
                 loc.category.toLowerCase().includes(searchQuery.toLowerCase())
               ).map(loc => {
               const isSelected = (customStops || []).includes(loc.id);
-              const distFromUser = userLocation && loc.coordinates ? calculateDistance(userLocation[0], userLocation[1], loc.coordinates[0], loc.coordinates[1]) : null;
+              const distFromUser = userLocation && loc.lat && loc.lng ? calculateDistance(userLocation[0], userLocation[1], loc.lat, loc.lng) : null;
               
               return (
                 <button
@@ -211,7 +211,7 @@ export default function RouteBuilder({ locations = [], onSelectCircuit, customSt
                     <div>
                       <h4 className="text-base font-black text-black">Your Custom Path</h4>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                        {customStops.length} Stops • {customStops.length > 1 ? calculateTotalDistance(customStops.map(id => locations.find(l => l.id === id)).filter(Boolean)) : '0'} KM
+                         {customStops.length} Stops • {customStops.length > 1 ? (calculateTotalDistance(customStops.map(id => locations.find(l => l.id === id)).filter(Boolean)) || '0') : '0'} KM
                       </p>
                     </div>
                  </div>

@@ -6,6 +6,7 @@ import {
   Route
 } from 'lucide-react';
 import { calculateDistance } from '../utils/haversine';
+import { getPlaceTimings } from '../utils/timings';
 
 const seedReviewsCache = {};
 
@@ -177,6 +178,7 @@ export default function LocationDetail({
   const lat = location.lat || (location.coordinates && location.coordinates[0]);
   const lng = location.lng || (location.coordinates && location.coordinates[1]);
   const distFromUser = userLocation && lat && lng ? calculateDistance(userLocation[0], userLocation[1], lat, lng) : null;
+  const timings = getPlaceTimings(location);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -328,6 +330,63 @@ export default function LocationDetail({
                 <div>
                   <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Distance from you</h4>
                   <p className="text-sm font-black text-black">{distFromUser} KM</p>
+                </div>
+              </div>
+            )}
+
+            {/* Operating Hours & Live Status Card */}
+            {timings && (
+              <div className="bg-gray-50 border-2 border-white p-6 rounded-[2.5rem] shadow-sm text-left animate-in slide-in-from-bottom duration-500 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-amazon-navy/10 rounded-xl flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-amazon-navy" />
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Operating Timeline</h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                        timings.color === 'green' ? 'bg-green-100 text-green-700 border border-green-200' :
+                        timings.color === 'yellow' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                        'bg-red-100 text-red-700 border border-red-200'
+                      }`}>
+                        {timings.statusText}
+                      </span>
+                      <span className="text-[11px] font-bold text-gray-500">{timings.reason}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-100 pt-3 space-y-3">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Schedule</span>
+                    <span className="font-black text-black">{timings.label}</span>
+                  </div>
+                  
+                  {/* Visual Hourly Timeline Bar */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[8px] font-black text-gray-400 uppercase tracking-widest px-1">
+                      <span>Timeline (6 AM - 10 PM)</span>
+                    </div>
+                    <div className="flex gap-1 h-3 items-center">
+                      {timings.timeline.map((slot) => (
+                        <div 
+                          key={slot.hour}
+                          className={`flex-1 h-2 rounded-full transition-all duration-300 ${
+                            slot.status === 'open' 
+                              ? 'bg-amazon-yellow shadow-[0_0_4px_rgba(240,193,75,0.4)]' 
+                              : 'bg-gray-200'
+                          }`}
+                          title={`${slot.hour}:00 - ${slot.status === 'open' ? 'Open' : 'Closed'}`}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[8px] font-black text-gray-400 px-0.5 pt-0.5">
+                      <span>6 AM</span>
+                      <span>12 PM</span>
+                      <span>6 PM</span>
+                      <span>10 PM</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

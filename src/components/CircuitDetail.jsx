@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { 
   X, MapPin, Compass, Car, CheckCircle, Navigation, 
-  ArrowRight, Shield, Zap, Calendar, ArrowLeftRight, Bookmark
+  ArrowRight, Shield, Zap, Calendar, ArrowLeftRight, Bookmark, Clock
 } from 'lucide-react';
 import { calculateDistance } from '../utils/haversine';
+import { getPlaceTimings } from '../utils/timings';
+import { generateGoogleMapsDirUrl } from '../utils/maps';
 
 export default function CircuitDetail({ 
   customStops = [], 
@@ -16,6 +18,20 @@ export default function CircuitDetail({
   const [bookingStatus, setBookingStatus] = useState('idle'); // idle, confirming, success
   const [panelWidth, setPanelWidth] = useState(480);
   const isDragging = React.useRef(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    try {
+      const savedList = JSON.parse(localStorage.getItem('mangalore_saved_circuits') || '[]');
+      const match = savedList.some(saved => {
+        if (saved.stops.length !== customStops.length) return false;
+        return saved.stops.every((stop, idx) => stop.id === customStops[idx]);
+      });
+      setIsSaved(match);
+    } catch {
+      setIsSaved(false);
+    }
+  }, [customStops]);
 
   // Combine standard locations and hidden gems for lookups
   const allSearchable = React.useMemo(() => {
@@ -125,20 +141,23 @@ export default function CircuitDetail({
     }, 1800);
   };
 
-  const [isSaved, setIsSaved] = useState(false);
-
-  useEffect(() => {
-    try {
-      const savedList = JSON.parse(localStorage.getItem('mangalore_saved_circuits') || '[]');
-      const match = savedList.some(saved => {
-        if (saved.stops.length !== customStops.length) return false;
-        return saved.stops.every((stop, idx) => stop.id === customStops[idx]);
-      });
-      setIsSaved(match);
-    } catch {
-      setIsSaved(false);
+  const handleExportToGoogleMaps = () => {
+    if (segments.length === 0) return;
+    
+    // Starting coordinate followed by stops coordinates
+    const routePoints = [
+      { coords: startCoords },
+      ...segments.map(seg => ({ coords: seg.coords }))
+    ];
+    
+    const url = generateGoogleMapsDirUrl(routePoints);
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      alert("Could not generate Google Maps route.");
     }
-  }, [customStops]);
+  };
+
 
   const handleSaveCircuit = () => {
     if (circuitStops.length === 0) return;
@@ -248,6 +267,7 @@ export default function CircuitDetail({
 
                 {segments.map((seg, idx) => {
                   const isLast = idx === segments.length - 1;
+                  const timings = getPlaceTimings(seg.stop);
                   return (
                     <div key={seg.stop.id} className="relative group animate-in slide-in-from-bottom duration-300" style={{ animationDelay: `${idx * 100}ms` }}>
                       {/* Connection Line segment display */}
@@ -266,10 +286,27 @@ export default function CircuitDetail({
                           <div className="w-16 h-16 rounded-xl overflow-hidden shadow-inner shrink-0 bg-gray-200">
                             <img src={seg.stop.image} alt={seg.stop.name} className="w-full h-full object-cover" />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <span className="text-[9px] font-black text-amazon-navy uppercase tracking-widest block">{seg.stop.category || 'Waypoint'}</span>
-                            <h4 className="text-base font-black text-black truncate">{seg.stop.name}</h4>
+                          <div className="flex-1 min-w-0 text-left">
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              <span className="text-[9px] font-black text-amazon-navy uppercase tracking-widest block">{seg.stop.category || 'Waypoint'}</span>
+                              {timings && (
+                                <span className={`inline-block px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider ${
+                                  timings.color === 'green' ? 'bg-green-50 text-green-700 border border-green-200' :
+                                  timings.color === 'yellow' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' :
+                                  'bg-red-50 text-red-700 border border-red-200'
+                                }`}>
+                                  {timings.statusText}
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="text-base font-black text-black truncate mt-1">{seg.stop.name}</h4>
                             <p className="text-[10px] font-bold text-gray-400 truncate">{seg.stop.region || 'Mangalore Sector'}</p>
+                            {timings && (
+                              <p className="text-[9px] font-bold text-gray-400 mt-1.5 flex items-center gap-1">
+                                <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                <span className="truncate">{timings.label} ({timings.reason})</span>
+                              </p>
+                            )}
                           </div>
                         </div>
 
@@ -300,6 +337,13 @@ export default function CircuitDetail({
                 className="w-full py-4.5 bg-amazon-navy text-white rounded-3xl text-sm font-black shadow-xl hover:shadow-amazon-navy/20 hover:bg-amazon-navy/95 transition-all active:scale-95 flex items-center justify-center gap-2"
               >
                 <Car className="w-5 h-5 text-amazon-yellow" /> Schedule Circuit Ride
+              </button>
+
+              <button
+                onClick={handleExportToGoogleMaps}
+                className="w-full py-4.5 bg-gradient-to-r from-amazon-yellow to-amazon-orange text-amazon-navy hover:text-white rounded-3xl text-sm font-black shadow-lg hover:shadow-amazon-yellow/20 hover:scale-[1.02] transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Navigation className="w-5 h-5" /> Export to Google Maps
               </button>
 
               <button

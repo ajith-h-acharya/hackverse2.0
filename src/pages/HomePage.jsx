@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { EXPERIENCE_THEMES, locations } from '../data/locations';
-import { Compass, Calendar, MapPin, Star, X, CheckCircle, Bed, ArrowRight, Music, Plane, Landmark, Waves, Utensils, Zap, Sparkles, Camera, History, Bookmark } from 'lucide-react';
+import { Compass, Calendar, MapPin, Star, X, CheckCircle, Bed, ArrowRight, Music, Plane, Landmark, Waves, Utensils, Zap, Sparkles, Camera, History, Bookmark, User } from 'lucide-react';
 import ChatAssistant from '../components/ChatAssistant';
 import Mascot from '../components/Mascot';
 
@@ -47,6 +47,55 @@ function FloatingParticle({ delay, duration, left, size, icon: Icon, text, color
 export default function HomePage() {
   const navigate = useNavigate();
   const [isLaunching, setIsLaunching] = useState(false);
+  const [hasSharedSession, setHasSharedSession] = useState(false);
+  const [sharedEmail, setSharedEmail] = useState('');
+
+  useEffect(() => {
+    const backup = localStorage.getItem('mangalore_original_user');
+    if (backup) {
+      setHasSharedSession(true);
+      const email = localStorage.getItem('mangalore_user_email');
+      setSharedEmail(email || 'Shared User');
+    }
+  }, []);
+
+  const handleDisconnectSharedSession = async () => {
+    const backup = localStorage.getItem('mangalore_original_user');
+    if (!backup) return;
+
+    try {
+      const originalUser = JSON.parse(backup);
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const token = localStorage.getItem('mangalore_session_token') || '';
+      const res = await fetch(`${API_URL}/api/user-data?email=${encodeURIComponent(originalUser.email.toLowerCase())}&requestorEmail=${encodeURIComponent(originalUser.email.toLowerCase())}&token=${encodeURIComponent(token)}`);
+      
+      if (res.ok) {
+        const data = await res.json();
+        
+        if (window.__setSyncLoading) window.__setSyncLoading(true);
+        
+        localStorage.setItem('mangalore_user_name', data.name || '');
+        localStorage.setItem('mangalore_user_email', data.email);
+        localStorage.setItem('mangalore_user_phone', data.phone || '');
+        localStorage.setItem('mangalore_user_squad_size', data.squadSize || '4');
+        localStorage.setItem('mangalore_user_expedition_days', data.expeditionDays || '5');
+        localStorage.setItem('mangalore_session_token', originalUser.sessionToken || '');
+        localStorage.setItem('mangalore_saved_circuits', data.savedCircuits || '[]');
+        localStorage.setItem('mangalore_circuit_history', data.circuitHistory || '[]');
+        localStorage.setItem('mangalore_favorites', data.favorites || '[]');
+        
+        localStorage.removeItem('mangalore_original_user');
+        
+        if (window.__setSyncLoading) window.__setSyncLoading(false);
+        
+        window.location.reload();
+      }
+    } catch (err) {
+      console.warn("Failed to disconnect session:", err);
+      localStorage.removeItem('mangalore_original_user');
+      window.location.reload();
+    }
+  };
 
   const handleExplore = (e) => {
     e.preventDefault();
@@ -56,8 +105,28 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-amazon-navy text-white flex flex-col font-sans selection:bg-amazon-yellow selection:text-amazon-navy overflow-x-hidden relative">
       
+      {/* Active Shared Session Banner */}
+      {hasSharedSession && (
+        <div className="w-full bg-gradient-to-r from-amazon-orange/95 via-amazon-yellow to-amazon-orange/95 backdrop-blur-md py-3 px-8 flex justify-between items-center z-[100] text-amazon-navy border-b border-amazon-orange/30 font-bold sticky top-0">
+          <div className="flex items-center gap-3">
+            <span className="px-2.5 py-0.5 bg-amazon-navy text-white text-[8px] font-black uppercase tracking-widest rounded-full animate-pulse shrink-0">
+              Shared Mode
+            </span>
+            <p className="text-xs font-black tracking-wide leading-none">
+              ⚡ CONNECTED TO SHARE: You are viewing and editing {sharedEmail}'s planner.
+            </p>
+          </div>
+          <button 
+            onClick={handleDisconnectSharedSession}
+            className="px-4 py-1.5 bg-amazon-navy hover:bg-[#232f3e] text-white hover:text-amazon-yellow text-[9px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 shrink-0"
+          >
+            Disconnect & Return
+          </button>
+        </div>
+      )}
+
       {/* Floating Top Header */}
-      <nav className="absolute top-0 left-0 w-full z-50 px-8 py-6 flex justify-between items-center bg-transparent">
+      <nav className={`absolute left-0 w-full z-50 px-8 py-6 flex justify-between items-center bg-transparent ${hasSharedSession ? 'top-10 md:top-12' : 'top-0'}`}>
         <div className="flex items-center gap-3 text-white font-black text-xl tracking-tight select-none">
           <span className="text-amazon-yellow">MANGLORE</span>.NAV
         </div>
@@ -67,6 +136,9 @@ export default function HomePage() {
           </Link>
           <Link to="/history" className="text-white/70 hover:text-amazon-yellow text-xs font-black uppercase tracking-widest transition-colors no-underline flex items-center gap-1.5">
             <History className="w-4 h-4" /> History Log
+          </Link>
+          <Link to="/account" className="text-white/70 hover:text-amazon-yellow text-xs font-black uppercase tracking-widest transition-colors no-underline flex items-center gap-1.5 bg-white/5 border border-white/10 hover:border-amazon-yellow/50 px-4 py-2 rounded-2xl">
+            <User className="w-4 h-4 text-amazon-yellow" /> Account
           </Link>
         </div>
       </nav>

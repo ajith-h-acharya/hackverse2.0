@@ -1,0 +1,243 @@
+{
+  "users": {
+    "admin_ajith@gmail.com": {
+      "email": "admin_ajith@gmail.com",
+      "name": "Admin Ajith",
+      "phone": "9876543210",
+      "squadSize": "1",
+      "expeditionDays": "99",
+      "password": "$2b$10$Ili1..VFGNw.NFaw2X9JvegXNbuU8EC1jkOsJHLDec99rf.ubL3BG",
+      "role": "admin",
+      "sessionToken": "79f43f4e-82f0-416f-b95e-2f3d04ecf575",
+      "savedCircuits": "[]",
+      "circuitHistory": "[]",
+      "favorites": "[]"
+    },
+    "ajithachar231@gmail.com": {
+      "email": "ajithachar231@gmail.com",
+      "name": "Ajith H Acharya",
+      "phone": "7022908345",
+      "squadSize": "4",
+      "expeditionDays": "4",
+      "password": "$2b$10$ca6Cuhufs/qUUdhNb.fy0ujLy9uC3.kctf7AzWCJwlEb5uZyqziIW",
+      "sessionToken": "7cd08812-48f1-4c2c-bb0f-edf62e059a75",
+      "savedCircuits": "[]",
+      "circuitHistory": "[]",
+      "favorites": "[39]"
+    }
+  },
+  "friendRequests": [],
+  "loginHistory": [
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T15:24:15.143Z",
+      "action": "Administrative Access / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "dummy-explorer@gmail.com",
+      "timestamp": "2026-06-02T15:24:15.264Z",
+      "action": "New Explorer Registered / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T15:24:15.272Z",
+      "action": "Admin: Updated details for user dummy-explorer@gmail.com",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T15:24:15.282Z",
+      "action": "Admin: DELETED user account dummy-explorer@gmail.com",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T15:28:18.301Z",
+      "action": "Administrative Access / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T15:30:18.742Z",
+      "action": "Admin: DELETED user account ajithachar231@gmail.com",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T15:30:23.260Z",
+      "action": "Admin: DELETED user account ajith.ai25@sahyadri.edu.in",
+      "status": "success"
+    },
+    {
+      "email": "ajithachar231@gmail.com",
+      "timestamp": "2026-06-02T15:38:12.260Z",
+      "action": "Automatic Registration / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T15:41:51.083Z",
+      "action": "Administrative Access / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T15:42:00.033Z",
+      "action": "Admin: DELETED user account ajithachar231@gmail.com",
+      "status": "success"
+    },
+    {
+      "email": "ajithachar231@gmail.com",
+      "timestamp": "2026-06-02T15:43:07.968Z",
+      "action": "New Explorer Registered / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "ajithachar231@gmail.com",
+      "timestamp": "2026-06-02T15:56:36.732Z",
+      "action": "Security Check / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "ajithachar231@gmail.com",
+      "timestamp": "2026-06-02T15:58:26.721Z",
+      "action": "Security Access Refused (Incorrect Credentials)",
+      "status": "failure"
+    },
+    {
+      "email": "ajithachar231@gmail.com",
+      "timestamp": "2026-06-02T15:58:31.633Z",
+      "action": "Security Check / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "ajithachar231@gmail.com",
+      "timestamp": "2026-06-02T16:12:43.730Z",
+      "action": "Security Check / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "ajithachar231@gmail.com",
+      "timestamp": "2026-06-02T16:23:37.874Z",
+      "action": "Security Check / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "ajithachar231@gmail.com",
+      "timestamp": "2026-06-02T16:31:54.181Z",
+      "action": "Security Check / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "tester-738464@example.com",
+      "timestamp": "2026-06-02T16:50:12.565Z",
+      "action": "New Explorer Registered / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "tester-738464@example.com",
+      "timestamp": "2026-06-02T16:50:12.671Z",
+      "action": "Security Check / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "tester-738464@example.com",
+      "timestamp": "2026-06-02T16:50:12.765Z",
+      "action": "Security Access Refused (Incorrect Credentials)",
+      "status": "failure"
+    },
+    {
+      "email": "friend-350278@example.com",
+      "timestamp": "2026-06-02T16:50:12.874Z",
+      "action": "New Explorer Registered / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "friend-350278@example.com",
+      "timestamp": "2026-06-02T16:50:12.969Z",
+      "action": "Security Check / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T16:50:39.848Z",
+      "action": "Administrative Access / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "dummy-explorer@gmail.com",
+      "timestamp": "2026-06-02T16:50:39.972Z",
+      "action": "New Explorer Registered / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T16:50:39.978Z",
+      "action": "Admin: Updated details for user dummy-explorer@gmail.com",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T16:50:39.984Z",
+      "action": "Admin: DELETED user account dummy-explorer@gmail.com",
+      "status": "success"
+    },
+    {
+      "email": "tester-231862@example.com",
+      "timestamp": "2026-06-02T16:52:44.459Z",
+      "action": "New Explorer Registered / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "tester-231862@example.com",
+      "timestamp": "2026-06-02T16:52:44.566Z",
+      "action": "Security Check / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "tester-231862@example.com",
+      "timestamp": "2026-06-02T16:52:44.668Z",
+      "action": "Security Access Refused (Incorrect Credentials)",
+      "status": "failure"
+    },
+    {
+      "email": "friend-108667@example.com",
+      "timestamp": "2026-06-02T16:52:44.778Z",
+      "action": "New Explorer Registered / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "friend-108667@example.com",
+      "timestamp": "2026-06-02T16:52:44.871Z",
+      "action": "Security Check / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T16:52:50.927Z",
+      "action": "Administrative Access / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "dummy-explorer@gmail.com",
+      "timestamp": "2026-06-02T16:52:51.037Z",
+      "action": "New Explorer Registered / Access Granted",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T16:52:51.044Z",
+      "action": "Admin: Updated details for user dummy-explorer@gmail.com",
+      "status": "success"
+    },
+    {
+      "email": "admin_ajith@gmail.com",
+      "timestamp": "2026-06-02T16:52:51.051Z",
+      "action": "Admin: DELETED user account dummy-explorer@gmail.com",
+      "status": "success"
+    }
+  ],
+  "otps": {}
+}

@@ -27,6 +27,8 @@ export default function ChatAssistant({
   const recognitionRef = useRef(null);
   const [showHelpBubble, setShowHelpBubble] = useState(false);
 
+  const handleSendRef = useRef(null);
+
   const getContextSuggestions = () => {
     if (selectedLocation) {
       return [
@@ -127,8 +129,8 @@ export default function ChatAssistant({
         const transcript = event.results[0][0].transcript;
         setInput(transcript);
         setIsListening(false);
-        // Automatically send after voice input
-        setTimeout(() => handleSend(transcript), 500);
+        // Automatically send after voice input — use ref to avoid stale closure
+        setTimeout(() => handleSendRef.current?.(transcript), 500);
       };
 
       recognitionRef.current.onerror = (event) => {
@@ -153,6 +155,7 @@ export default function ChatAssistant({
   };
 
   const handleSend = async (manualInput) => {
+    handleSendRef.current = handleSend;
     const textToSend = manualInput || input;
     if (!textToSend.trim()) return;
 
@@ -360,7 +363,7 @@ export default function ChatAssistant({
                   placeholder={isListening ? "Speak now..." : "Ask manglore.nav..."}
                   value={input}
                   onChange={e => setInput(e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && handleSend()}
+                  onKeyDown={e => e.key === 'Enter' && handleSend()}
                   className="w-full pl-6 pr-12 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-sm font-black text-black placeholder:text-gray-400 focus:border-amazon-navy focus:bg-white transition-all outline-none shadow-inner"
                 />
                 <button
