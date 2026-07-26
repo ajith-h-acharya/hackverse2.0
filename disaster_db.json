@@ -1,0 +1,169 @@
+{
+  "camps": [
+    {
+      "id": "camp_alpha",
+      "name": "Camp Alpha (Lalbagh)",
+      "lat": 12.8837,
+      "lng": 74.843,
+      "resources": {
+        "food_kg": 500,
+        "water_liters": 1200,
+        "medical_kits": 80,
+        "boats": 3,
+        "trucks": 4,
+        "helicopters": 1
+      }
+    },
+    {
+      "id": "camp_beta",
+      "name": "Camp Beta (Manipal Center)",
+      "lat": 13.3409,
+      "lng": 74.7865,
+      "resources": {
+        "food_kg": 800,
+        "water_liters": 2000,
+        "medical_kits": 150,
+        "boats": 1,
+        "trucks": 6,
+        "helicopters": 2
+      }
+    },
+    {
+      "id": "camp_coastal",
+      "name": "Coastal Rescue Unit (Ullal)",
+      "lat": 12.802,
+      "lng": 74.851,
+      "resources": {
+        "food_kg": 300,
+        "water_liters": 800,
+        "medical_kits": 50,
+        "boats": 5,
+        "trucks": 2,
+        "helicopters": 0
+      }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "v_amb_1",
+      "name": "Ambulance Alpha-1",
+      "type": "Ambulance",
+      "status": "Idle",
+      "camp_id": "camp_alpha",
+      "lat": 12.8837,
+      "lng": 74.843,
+      "speed_kmh": 45,
+      "route_geometry": [],
+      "route_index": 0,
+      "destinations": [],
+      "current_supplies": {}
+    },
+    {
+      "id": "v_boat_1",
+      "name": "Rescue Boat Alpha-2",
+      "type": "Boat",
+      "status": "Idle",
+      "camp_id": "camp_alpha",
+      "lat": 12.8837,
+      "lng": 74.843,
+      "speed_kmh": 25,
+      "route_geometry": [],
+      "route_index": 0,
+      "destinations": [],
+      "current_supplies": {}
+    },
+    {
+      "id": "v_truck_1",
+      "name": "Supply Truck Beta-1",
+      "type": "Truck",
+      "status": "Idle",
+      "camp_id": "camp_beta",
+      "lat": 13.3409,
+      "lng": 74.7865,
+      "speed_kmh": 35,
+      "route_geometry": [],
+      "route_index": 0,
+      "destinations": [],
+      "current_supplies": {}
+    },
+    {
+      "id": "v_heli_1",
+      "name": "Helo Lifesaver Beta-2",
+      "type": "Helicopter",
+      "status": "Idle",
+      "camp_id": "camp_beta",
+      "lat": 13.3409,
+      "lng": 74.7865,
+      "speed_kmh": 120,
+      "route_geometry": [],
+      "route_index": 0,
+      "destinations": [],
+      "current_supplies": {}
+    },
+    {
+      "id": "v_boat_2",
+      "name": "Speed Rescue Ullal-1",
+      "type": "Boat",
+      "status": "Idle",
+      "camp_id": "camp_coastal",
+      "lat": 12.802,
+      "lng": 74.851,
+      "speed_kmh": 30,
+      "route_geometry": [],
+      "route_index": 0,
+      "destinations": [],
+      "current_supplies": {}
+    }
+  ],
+  "blocked_roads": [
+    {
+      "id": "block_1",
+      "name": "Kuntikan Flyover Waterlogged",
+      "lat": 12.8911,
+      "lng": 74.8435,
+      "radius_km": 0.4
+    }
+  ],
+  "active_emergencies": [
+    {
+      "id": "sos_seed_1",
+      "source": "Twitter/X",
+      "username": "@suresh_k",
+      "text": "Water levels rising rapidly in Hampankatta! 4 people trapped on first floor, one elderly needs medicine!",
+      "timestamp": "2026-07-26T23:19:06.345860",
+      "is_emergency": true,
+      "pytorch_prob": 0.98,
+      "emergency_type": "Rescue",
+      "location": "Hampankatta",
+      "lat": 12.8698,
+      "lng": 74.8431,
+      "count": 4,
+      "urgency_score": 8,
+      "priority_score": 6.4,
+      "status": "Pending",
+      "assigned_vehicle": null,
+      "is_estimated_zone": false
+    },
+    {
+      "id": "sos_seed_2",
+      "source": "Twitter/X",
+      "username": "@kavitha_m",
+      "text": "Landslide block road in Manipal road near Kadiyali. Heavy rocks blocking vehicle entry, emergency rescue crew required",
+      "timestamp": "2026-07-26T23:19:06.345884",
+      "is_emergency": true,
+      "pytorch_prob": 0.94,
+      "emergency_type": "Hazard",
+      "location": "Kadiyali",
+      "lat": 13.3444,
+      "lng": 74.7937,
+      "count": 1,
+      "urgency_score": 6,
+      "priority_score": 3.6,
+      "status": "Pending",
+      "assigned_vehicle": null,
+      "is_estimated_zone": false
+    }
+  ],
+  "resolved_emergencies": [],
+  "social_feed": []
+}
